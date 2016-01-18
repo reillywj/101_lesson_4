@@ -8,6 +8,8 @@ def prompt(msg)
 end
 
 def display_board(brd)
+  system 'clear'
+  puts "You're #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}."
   space = ' '.center(5)
   blank_line = space + '|' + space + '|' + space
   divider = '-' * 5 + '+' + '-' * 5 + '+' + '-'*5
@@ -73,22 +75,29 @@ def marker_won?(brd, marker)
   answer
 end
 
-board = initialize_board
+# Run
 loop do
-  system 'clear'
+  board = initialize_board
+  loop do
+    display_board board
+    player_places_piece! board
+    break if marker_won?(board, PLAYER_MARKER) || board_full?(board)
+    computer_places_piece! board
+    break if marker_won?(board, COMPUTER_MARKER) || board_full?(board)
+  end
+
   display_board board
-  player_places_piece! board
-  break if marker_won?(board, PLAYER_MARKER) || board_full?(board)
-  computer_places_piece! board
-  break if marker_won?(board, COMPUTER_MARKER) || board_full?(board)
-end
-system 'clear'
-display_board board
-if marker_won?(board, PLAYER_MARKER)
-  prompt "YOU WON!"
-elsif marker_won? board, COMPUTER_MARKER
-  prompt "You lost to the computer!"
-else
-  prompt "Tie game."
+
+  if marker_won?(board, PLAYER_MARKER)
+    prompt "YOU WON!"
+  elsif marker_won? board, COMPUTER_MARKER
+    prompt "You lost to the computer!"
+  else
+    prompt "Tie game."
+  end
+  prompt "Play again? (y or n)"
+  answer = gets.chomp
+  break unless %(y yes).include? answer.downcase
 end
 
+prompt 'Thank you for playing Tic-Tac-Toe!'
