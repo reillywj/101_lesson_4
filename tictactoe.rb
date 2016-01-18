@@ -2,30 +2,28 @@ require 'pry'
 
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
-WINNING_COMBOS = [(1..3).to_a, (4..6).to_a, (7..9).to_a, [1, 4, 7], [2, 5, 8], [3, 6, 9], [1,5,9], [3,5,7], [1,3,7,9]]
+WINNING_COMBOS = [(1..3).to_a, (4..6).to_a, (7..9).to_a, [1, 4, 7], [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7], [1, 3, 7, 9]]
 def prompt(msg)
   puts "=> #{msg}"
 end
 
+# rubocop:disable Metrics/AbcSize
 def display_board(brd)
   system 'clear'
   puts "You're #{PLAYER_MARKER}. Computer is #{COMPUTER_MARKER}."
   space = ' '.center(5)
-  blank_line = space + '|' + space + '|' + space
-  divider = '-' * 5 + '+' + '-' * 5 + '+' + '-'*5
-
-  puts blank_line 
+  blank_line = space + '|' + space + '|' + space + "\n"
+  divider = '-' * 5 + '+' + '-' * 5 + '+' + '-' * 5 + "\n"
+  new_line = blank_line + divider + blank_line
+  puts blank_line
   puts display_marker_line [brd[1], brd[2], brd[3]]
-  puts blank_line
-  puts divider
-  puts blank_line
+  puts new_line
   puts display_marker_line [brd[4], brd[5], brd[6]]
-  puts blank_line
-  puts divider
-  puts blank_line
+  puts new_line
   puts display_marker_line [brd[7], brd[8], brd[9]]
   puts blank_line
 end
+# rubocop:enable Metrics/AbcSize
 
 def display_marker_line(marked_line)
   marked_line[0].center(5) + '|' + marked_line[1].center(5) + '|' + marked_line[2].center(5)
@@ -33,7 +31,7 @@ end
 
 def initialize_board
   new_board = {}
-  (1..9).each { |number| new_board[number] = "[#{number}]"}
+  (1..9).each { |number| new_board[number] = "[#{number}]" }
   new_board
 end
 
@@ -54,7 +52,7 @@ def computer_places_piece!(brd)
 end
 
 def empty_squares(brd)
-  brd.keys.select{|num| ![PLAYER_MARKER, COMPUTER_MARKER].include?(brd[num])}
+  brd.keys.select { |num| ![PLAYER_MARKER, COMPUTER_MARKER].include?(brd[num]) }
 end
 
 def board_full?(brd)
@@ -71,7 +69,7 @@ end
 
 def marker_won?(brd, marker)
   answer = false
-  WINNING_COMBOS.each{ |combo| answer = answer || markers_same?(brd, combo, marker) }
+  WINNING_COMBOS.each { |combo| answer ||= markers_same?(brd, combo, marker) }
   answer
 end
 
