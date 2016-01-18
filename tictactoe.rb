@@ -48,8 +48,15 @@ def player_places_piece!(brd)
 end
 
 def computer_places_piece!(brd)
+  best_moves = computer_best_moves brd
   threats = immediate_threats brd
-  square = threats.empty? ? empty_squares(brd).sample : threats.sample
+  square = if !best_moves.empty?
+    best_moves.sample
+  elsif !threats.empty?
+    threats.sample
+  else
+    empty_squares(brd).sample
+  end
   brd[square] = COMPUTER_MARKER
 end
 
@@ -89,6 +96,17 @@ def immediate_threats(brd)
     end
   end
   threats.flatten
+end
+
+def computer_best_moves(brd)
+  best_moves = []
+  WINNING_COMBOS.each do |combo|
+    if brd.values_at(*combo).count(COMPUTER_MARKER) == combo.size - 1 &&
+       brd.values_at(*combo).count(PLAYER_MARKER) == 0
+      best_moves << brd.select { |key, marker| marker != COMPUTER_MARKER && combo.include?(key) }.keys
+    end
+  end
+  best_moves.flatten
 end
 
 # Run
