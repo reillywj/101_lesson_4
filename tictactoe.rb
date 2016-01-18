@@ -3,6 +3,7 @@ require 'pry'
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
 WINNING_COMBOS = [(1..3).to_a, (4..6).to_a, (7..9).to_a, [1, 4, 7], [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7], [1, 3, 7, 9]]
+WINNING_GAMES = 5
 def prompt(msg)
   puts "=> #{msg}"
 end
@@ -47,7 +48,8 @@ def player_places_piece!(brd)
 end
 
 def computer_places_piece!(brd)
-  square = empty_squares(brd).sample
+  threats = immediate_threats brd
+  square = threats.empty? ? empty_squares(brd).sample : threats.sample
   brd[square] = COMPUTER_MARKER
 end
 
@@ -60,11 +62,7 @@ def board_full?(brd)
 end
 
 def markers_same?(brd, combo, marker)
-  result = brd.values_at(*combo).count(marker) == combo.size
-  # combo.each_index do |index|
-  #   result = brd[combo[index]] == brd[combo[index + 1]] if (index < combo.size - 1) && result
-  # end
-  result && brd[combo[0]] == marker
+  brd.values_at(*combo).count(marker) == combo.size && brd[combo[0]] == marker
 end
 
 def marker_won?(brd, marker)
@@ -73,29 +71,64 @@ def marker_won?(brd, marker)
   answer
 end
 
+def initialize_score
+  { player: 0, computer: 0 }
+end
+
+def current_score(scr)
+  "#{scr[:player]} to #{scr[:computer]}"
+end
+
+def immediate_threats(brd)
+  # cycle through combos, if count is 2 and no computer marker, add space to threats
+  threats = []
+  WINNING_COMBOS.each do |combo|
+    if brd.values_at(*combo).count(PLAYER_MARKER) == combo.size - 1 &&
+       brd.values_at(*combo).count(COMPUTER_MARKER) == 0
+      threats << brd.select { |key, marker| marker != PLAYER_MARKER && combo.include?(key) }.keys
+    end
+  end
+  threats.flatten
+end
+
 # Run
 loop do
-  board = initialize_board
+  score = initialize_score
   loop do
+    board = initialize_board
+
+    loop do
+      display_board board
+      prompt current_score score
+      player_places_piece! board
+      break if marker_won?(board, PLAYER_MARKER) || board_full?(board)
+      computer_places_piece! board
+      break if marker_won?(board, COMPUTER_MARKER) || board_full?(board)
+    end
+
     display_board board
-    player_places_piece! board
-    break if marker_won?(board, PLAYER_MARKER) || board_full?(board)
-    computer_places_piece! board
-    break if marker_won?(board, COMPUTER_MARKER) || board_full?(board)
+
+    if marker_won?(board, PLAYER_MARKER)
+      prompt "YOU WON!"
+      score[:player] += 1
+    elsif marker_won? board, COMPUTER_MARKER
+      prompt "You lost to the computer!"
+      score[:computer] += 1
+    else
+      prompt "Tie game."
+    end
+    sleep 1
+    break if score.values.include? WINNING_GAMES
   end
 
-  display_board board
-
-  if marker_won?(board, PLAYER_MARKER)
-    prompt "YOU WON!"
-  elsif marker_won? board, COMPUTER_MARKER
-    prompt "You lost to the computer!"
+  if score[:player] > score[:computer]
+    prompt "You defeated the computer: #{current_score score}."
   else
-    prompt "Tie game."
+    prompt "You lost to the computer: #{current_score score}."
   end
+
   prompt "Play again? (y or n)"
   answer = gets.chomp
   break unless %(y yes).include? answer.downcase
 end
-
 prompt 'Thank you for playing Tic-Tac-Toe!'
