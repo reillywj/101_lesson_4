@@ -4,6 +4,8 @@ PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
 WINNING_COMBOS = [(1..3).to_a, (4..6).to_a, (7..9).to_a, [1, 4, 7], [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7], [1, 3, 7, 9]]
 WINNING_GAMES = 5
+GAMEPLAY = "CHOOSE"
+
 def prompt(msg)
   puts "=> #{msg}"
 end
@@ -50,10 +52,13 @@ end
 def computer_places_piece!(brd)
   best_moves = computer_best_moves brd
   threats = immediate_threats brd
+  possible_squares = empty_squares brd
   square = if !best_moves.empty?
     best_moves.sample
   elsif !threats.empty?
     threats.sample
+  elsif possible_squares.include? 5
+    5
   else
     empty_squares(brd).sample
   end
@@ -109,19 +114,51 @@ def computer_best_moves(brd)
   best_moves.flatten
 end
 
+def ask_player_to_choose_first_player
+  player_first = true
+  prompt "Pick who goes first: 1 = Player and 2 = Computer"
+  answer = gets.chomp
+  if answer == '1'
+    player_first = true
+  elsif answer == '2'
+    player_first = false
+  else
+    prompt "Invalid entry."
+    player_first = ask_player_to_choose_first_player
+  end
+  player_first
+end
+
+def someone_won?(brd)
+  marker_won?(brd, PLAYER_MARKER) || marker_won?(brd, COMPUTER_MARKER)
+end
+
+def gameover?(brd)
+  someone_won?(brd) || board_full?(brd)
+end
+
+def display_board_and_score(brd, scr)
+  display_board brd
+  prompt current_score scr
+end
+
 # Run
 loop do
   score = initialize_score
   loop do
+    player_first = true
+    if GAMEPLAY.downcase == 'choose'
+      player_first = ask_player_to_choose_first_player
+    end
     board = initialize_board
 
     loop do
-      display_board board
-      prompt current_score score
-      player_places_piece! board
-      break if marker_won?(board, PLAYER_MARKER) || board_full?(board)
-      computer_places_piece! board
-      break if marker_won?(board, COMPUTER_MARKER) || board_full?(board)
+      display_board_and_score board, score
+      player_first ? player_places_piece!(board) : computer_places_piece!(board)
+      break if gameover? board
+      display_board_and_score board, score
+      player_first ? computer_places_piece!(board) : player_places_piece!(board)
+      break if gameover? board
     end
 
     display_board board
@@ -136,6 +173,7 @@ loop do
       prompt "Tie game."
     end
     sleep 1
+    prompt current_score score
     break if score.values.include? WINNING_GAMES
   end
 
