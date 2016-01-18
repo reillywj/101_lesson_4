@@ -2,7 +2,7 @@ require 'pry'
 
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
-WINNING_COMBOS = [(1..3).to_a, (4..6).to_a, (7..9).to_a, [1, 4, 7], [2, 5, 8], [3, 6, 9], [1,5,9], [3,5,7]]
+WINNING_COMBOS = [(1..3).to_a, (4..6).to_a, (7..9).to_a, [1, 4, 7], [2, 5, 8], [3, 6, 9], [1,5,9], [3,5,7], [1,3,7,9]]
 def prompt(msg)
   puts "=> #{msg}"
 end
@@ -60,7 +60,11 @@ def board_full?(brd)
 end
 
 def markers_same?(brd, combo, marker)
-  brd[combo[0]] == brd[combo[1]] && brd[combo[1]] == brd[combo[2]] && brd[combo[2]] == marker
+  result = true
+  combo.each_index do |index|
+    result = brd[combo[index]] == brd[combo[index + 1]] if (index < combo.size - 1) && result
+  end
+  result && brd[combo[0]] == marker
 end
 
 def marker_won?(brd, marker)
