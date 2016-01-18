@@ -54,14 +54,14 @@ def computer_places_piece!(brd)
   threats = immediate_threats brd
   possible_squares = empty_squares brd
   square = if !best_moves.empty?
-    best_moves.sample
-  elsif !threats.empty?
-    threats.sample
-  elsif possible_squares.include? 5
-    5
-  else
-    empty_squares(brd).sample
-  end
+             best_moves.sample
+           elsif !threats.empty?
+             threats.sample
+           elsif possible_squares.include? 5
+             5
+           else
+             empty_squares(brd).sample
+           end
   brd[square] = COMPUTER_MARKER
 end
 
