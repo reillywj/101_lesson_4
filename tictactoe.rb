@@ -16,11 +16,11 @@ def display_board(brd)
   divider = '-' * 5 + '+' + '-' * 5 + '+' + '-' * 5 + "\n"
   new_line = blank_line + divider + blank_line
   puts blank_line
-  puts display_marker_line [brd[1], brd[2], brd[3]]
+  puts display_marker_line brd.values_at(1, 2, 3)
   puts new_line
-  puts display_marker_line [brd[4], brd[5], brd[6]]
+  puts display_marker_line brd.values_at(4, 5, 6)
   puts new_line
-  puts display_marker_line [brd[7], brd[8], brd[9]]
+  puts display_marker_line brd.values_at(7, 8, 9)
   puts blank_line
 end
 # rubocop:enable Metrics/AbcSize
@@ -60,10 +60,10 @@ def board_full?(brd)
 end
 
 def markers_same?(brd, combo, marker)
-  result = true
-  combo.each_index do |index|
-    result = brd[combo[index]] == brd[combo[index + 1]] if (index < combo.size - 1) && result
-  end
+  result = brd.values_at(*combo).count(marker) == combo.size
+  # combo.each_index do |index|
+  #   result = brd[combo[index]] == brd[combo[index + 1]] if (index < combo.size - 1) && result
+  # end
   result && brd[combo[0]] == marker
 end
 
