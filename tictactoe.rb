@@ -2,6 +2,7 @@ require 'pry'
 
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
+WINNING_COMBOS = [(1..3).to_a, (4..6).to_a, (7..9).to_a, [1, 4, 7], [2, 5, 8], [3, 6, 9], [1,5,9], [3,5,7]]
 def prompt(msg)
   puts "=> #{msg}"
 end
@@ -45,13 +46,45 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
+def computer_places_piece!(brd)
+  square = empty_squares(brd).sample
+  brd[square] = COMPUTER_MARKER
+end
+
 def empty_squares(brd)
   brd.keys.select{|num| ![PLAYER_MARKER, COMPUTER_MARKER].include?(brd[num])}
 end
 
-board = initialize_board
-display_board board
+def board_full?(brd)
+  empty_squares(brd).empty?
+end
 
-player_places_piece! board
+def markers_same?(brd, combo, marker)
+  brd[combo[0]] == brd[combo[1]] && brd[combo[1]] == brd[combo[2]] && brd[combo[2]] == marker
+end
+
+def marker_won?(brd, marker)
+  answer = false
+  WINNING_COMBOS.each{ |combo| answer = answer || markers_same?(brd, combo, marker) }
+  answer
+end
+
+board = initialize_board
+loop do
+  system 'clear'
+  display_board board
+  player_places_piece! board
+  break if marker_won?(board, PLAYER_MARKER) || board_full?(board)
+  computer_places_piece! board
+  break if marker_won?(board, COMPUTER_MARKER) || board_full?(board)
+end
+system 'clear'
 display_board board
+if marker_won?(board, PLAYER_MARKER)
+  prompt "YOU WON!"
+elsif marker_won? board, COMPUTER_MARKER
+  prompt "You lost to the computer!"
+else
+  prompt "Tie game."
+end
 
