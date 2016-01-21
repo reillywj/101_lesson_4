@@ -4,7 +4,7 @@ SUITS = %w(clubs spades hearts diamonds)
 FACES = (2..10).to_a + %w(jack queen king ace)
 STANDARD_DECK = FACES.product SUITS
 DEALER_LIMIT = 17
-GAME_LIMIT = 21
+GAME_LIMIT = 21 # note I assumed 21 when writing add_aces method; would need modification if GAME_LIMIT is adjusted to any other value
 GAME_NAME = "Twenty One"
 
 def prompt(msg)
