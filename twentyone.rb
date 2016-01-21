@@ -53,13 +53,20 @@ def show_dealer_turn(player_cards, computer_cards)
 end
 
 def show_all(cards)
-  cards.each do |card|
+  cards.each_with_index do |card, index|
+    card_label(index + 1)
     show card
   end
 end
 
+def card_label(number)
+  print "Card #{number}: "
+end
+
 def show_hidden(cards)
+  card_label 1
   show cards[0]
+  card_label 2
   show %w(? ?)
 end
 
