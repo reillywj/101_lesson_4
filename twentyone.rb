@@ -150,6 +150,25 @@ def play_again?
   %(y yes).include? answer
 end
 
+# rubocop:disable Metrics/AbcSize
+def declare_winner(player, computer)
+  show_dealer_turn player, computer
+  if bust? player
+    prompt "You busted with #{score player}."
+  elsif twenty_one? player
+    prompt "Twenty One! You win!."
+  elsif bust? computer
+    prompt "Computer busted with #{score computer}. You win!"
+  elsif score(player) == score(computer)
+    prompt "Tie! #{score player} v. #{score computer}."
+  elsif score(player) > score(computer)
+    prompt "You win! #{score player} v. Computer's #{score computer}."
+  else
+    prompt "You lose. #{score player} v. Computer's #{score computer}."
+  end
+end
+# rubocop:enable Metrics/AbcSize
+
 # 1. Initialize deck
 # 2. deal 2 cards
 # 3. ask player hit/stay? check if broke or 21 else loop
@@ -175,20 +194,7 @@ loop do
     end
   end
 
-  show_dealer_turn player, computer
-  if bust? player
-    prompt "You busted with #{score player}."
-  elsif twenty_one? player
-    prompt "Twenty One! You win!."
-  elsif bust? computer
-    prompt "Computer busted with #{score computer}. You win!"
-  elsif score(player) == score(computer)
-    prompt "Tie! #{score player} v. #{score computer}."
-  elsif score(player) > score(computer)
-    prompt "You win! #{score player} v. Computer's #{score computer}."
-  else
-    prompt "You lose. #{score player} v. Computer's #{score computer}."
-  end
+  declare_winner player, computer
 
   break unless play_again?
 end
