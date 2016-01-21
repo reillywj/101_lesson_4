@@ -17,7 +17,6 @@ def title
 end
 
 def new_deck
-  binding.pry
   STANDARD_DECK.shuffle
 end
 
@@ -145,24 +144,42 @@ def play_again?
   %(y yes).include? answer
 end
 
-# rubocop:disable Metrics/AbcSize
+def detect_result(player_cards, computer_cards)
+  player_total = score player_cards
+  computer_total = score computer_cards
+
+  if player_total > GAME_LIMIT
+    :player_busted
+  elsif player_total == GAME_LIMIT
+    :player_twenty_one
+  elsif computer_total > GAME_LIMIT
+    :computer_busted
+  elsif player_total == computer_total
+    :tie
+  elsif player_total > computer_total
+    :player_wins
+  else
+    :computer_wins
+  end
+end
+
 def declare_winner(player, computer)
   show_dealer_turn player, computer
-  if bust? player
+  case detect_result(player, computer)
+  when :player_busted
     prompt "You busted with #{score player}."
-  elsif twenty_one? player
+  when :player_twenty_one
     prompt "Twenty One! You win!."
-  elsif bust? computer
+  when :computer_busted
     prompt "Computer busted with #{score computer}. You win!"
-  elsif score(player) == score(computer)
+  when :tie
     prompt "Tie! #{score player} v. #{score computer}."
-  elsif score(player) > score(computer)
+  when :player_wins
     prompt "You win! #{score player} v. Computer's #{score computer}."
-  else
+  when :computer_wins
     prompt "You lose. #{score player} v. Computer's #{score computer}."
   end
 end
-# rubocop:enable Metrics/AbcSize
 
 # 1. Initialize deck
 # 2. deal 2 cards
