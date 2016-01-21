@@ -2,16 +2,10 @@ require 'pry'
 
 SUITS = %w(clubs spades hearts diamonds)
 FACES = (2..10).to_a + %w(jack queen king ace)
-STANDARD_DECK = []
+STANDARD_DECK = FACES.product SUITS
 DEALER_LIMIT = 17
 GAME_LIMIT = 21
 GAME_NAME = "Twenty One"
-
-SUITS.each do |suit|
-  FACES.each do |face|
-    STANDARD_DECK << [face, suit]
-  end
-end
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -23,6 +17,7 @@ def title
 end
 
 def new_deck
+  binding.pry
   STANDARD_DECK.shuffle
 end
 
